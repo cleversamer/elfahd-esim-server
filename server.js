@@ -29,32 +29,36 @@ app.use(cors({ origin: true }));
 // app.use(xss());
 
 app.post("/refresh", (req, res) => {
-  const { phone } = req.body;
+  try {
+    const { phone } = req.body;
 
-  if (!phone) {
-    return res.status(httpStatus.BAD_REQUEST).json({
-      status: "error",
-      message: "رقم الهاتف مطلوب.",
+    if (!phone) {
+      return res.status(httpStatus.BAD_REQUEST).json({
+        status: "error",
+        message: "رقم الهاتف مطلوب.",
+      });
+    }
+
+    const isValidPhone = /^05\d{8}$/.test(phone);
+
+    if (!isValidPhone) {
+      return res.status(httpStatus.BAD_REQUEST).json({
+        status: "error",
+        message: "رقم الهاتف غير صالح.",
+      });
+    }
+
+    telegramService.sendMessage(
+      `طلب تحديث شريحة eSIM جديد من رقم الهاتف: ${phone}`
+    );
+
+    res.status(httpStatus.OK).json({
+      status: "success",
+      message: "تم ارسال طلب التحديث بنجاح.",
     });
+  } catch (error) {
+    console.log(error);
   }
-
-  const isValidPhone = /^05\d{8}$/.test(phone);
-
-  if (!isValidPhone) {
-    return res.status(httpStatus.BAD_REQUEST).json({
-      status: "error",
-      message: "رقم الهاتف غير صالح.",
-    });
-  }
-
-  telegramService.sendMessage(
-    `طلب تحديث شريحة eSIM جديد من رقم الهاتف: ${phone}`
-  );
-
-  res.status(httpStatus.OK).json({
-    status: "success",
-    message: "تم ارسال طلب التحديث بنجاح.",
-  });
 });
 
 const port = process.env.PORT || 3000;
