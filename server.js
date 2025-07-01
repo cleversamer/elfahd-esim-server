@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const app = express();
-const xss = require("xss-clean");
+// const xss = require("xss-clean");
 const cors = require("cors");
 const helmet = require("helmet");
 const { rateLimit } = require("express-rate-limit");
@@ -26,7 +26,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static("uploads"));
 app.use(helmet());
 app.use(cors({ origin: true }));
-app.use(xss());
+// app.use(xss());
 
 app.post("/refresh", (req, res) => {
   const { phone } = req.body;
