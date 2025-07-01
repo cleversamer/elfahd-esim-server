@@ -6,6 +6,7 @@ const cors = require("cors");
 const helmet = require("helmet");
 const { rateLimit } = require("express-rate-limit");
 const httpStatus = require("http-status");
+const telegramService = require("./telegram.service");
 
 // The following configuration will limit the number of requests
 // for each IP address per a certain amount of time.
@@ -27,6 +28,37 @@ app.use(helmet());
 app.use(cors({ origin: true }));
 app.use(xss());
 
-app.listen(process.env.PORT, () => {
-  console.log(`App is listening on port ${process.env.PORT}`);
+app.post("/refresh", (req, res) => {
+  const { phone } = req.body;
+
+  if (!phone) {
+    return res.status(httpStatus.BAD_REQUEST).json({
+      status: "error",
+      message: "رقم الهاتف مطلوب.",
+    });
+  }
+
+  const isValidPhone = /^05\d{8}$/.test(phone);
+
+  if (!isValidPhone) {
+    return res.status(httpStatus.BAD_REQUEST).json({
+      status: "error",
+      message: "رقم الهاتف غير صالح.",
+    });
+  }
+
+  telegramService.sendMessage(
+    `طلب تحديث شريحة eSIM جديد من رقم الهاتف: ${phone}`
+  );
+
+  res.status(httpStatus.OK).json({
+    status: "success",
+    message: "تم ارسال طلب التحديث بنجاح.",
+  });
+});
+
+const port = process.env.PORT || 3000;
+
+app.listen(port, () => {
+  console.log(`App is listening on port ${port}`);
 });
