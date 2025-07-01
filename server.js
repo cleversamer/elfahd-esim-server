@@ -5,7 +5,7 @@ const app = express();
 const cors = require("cors");
 const helmet = require("helmet");
 const { rateLimit } = require("express-rate-limit");
-const httpStatus = require("http-status");
+const { status: httpStatus } = require("http-status");
 const telegramService = require("./telegram.service");
 
 // The following configuration will limit the number of requests
