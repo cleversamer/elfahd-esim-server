@@ -89,7 +89,7 @@ app.post("/refresh", (req, res) => {
         });
 
         telegramService.sendMessage(
-          `طلب تحديث شريحة eSIM مرفوض من رقم الهاتف: ${phone}\nرسالة ليان:\n${response.data}`
+          `طلب تحديث شريحة eSIM مرفوض من رقم الهاتف: ${phone}\nرسالة ليان:\n${error?.message}`
         );
       });
   } catch (error) {
