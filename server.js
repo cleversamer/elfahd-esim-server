@@ -7,6 +7,7 @@ const helmet = require("helmet");
 const { rateLimit } = require("express-rate-limit");
 const { status: httpStatus } = require("http-status");
 const telegramService = require("./telegram.service");
+const axios = require("axios");
 
 // The following configuration will limit the number of requests
 // for each IP address per a certain amount of time.
@@ -48,16 +49,56 @@ app.post("/refresh", (req, res) => {
       });
     }
 
-    telegramService.sendMessage(
-      `طلب تحديث شريحة eSIM جديد من رقم الهاتف: ${phone}`
-    );
+    axios
+      .post(
+        "https://api.layan-t.net/api/Subscribtions/CustomersRefreshNumber",
+        { number: "0512791852" },
+        {
+          headers: {
+            Accept: "*/*",
+            "Accept-Language": "en-US,en;q=0.9,ar;q=0.8",
+            "Content-Type": "application/json",
+            lang: "ar",
+            priority: "u=1, i",
+            "sec-ch-ua":
+              '"Not)A;Brand";v="8", "Chromium";v="138", "Google Chrome";v="138"',
+            "sec-ch-ua-mobile": "?0",
+            "sec-ch-ua-platform": '"Windows"',
+            "sec-fetch-dest": "empty",
+            "sec-fetch-mode": "cors",
+            "sec-fetch-site": "same-site",
+            Referer: "https://rn.layan-t.net/",
+          },
+        }
+      )
+      .then((response) => {
+        res.status(httpStatus.OK).json({
+          status: "success",
+          // message: "تم ارسال طلب التحديث بنجاح.",
+          message: response.data,
+        });
 
-    res.status(httpStatus.OK).json({
-      status: "success",
-      message: "تم ارسال طلب التحديث بنجاح.",
-    });
+        telegramService.sendMessage(
+          `طلب تحديث شريحة eSIM جديد من رقم الهاتف: ${phone}\nرسالة ليان:\n${response.data}`
+        );
+      })
+      .catch((error) => {
+        res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+          status: "failure",
+          message: "حدث خطأ ما يرجى المحاولة لاحقًا",
+        });
+
+        telegramService.sendMessage(
+          `طلب تحديث شريحة eSIM مرفوض من رقم الهاتف: ${phone}\nرسالة ليان:\n${response.data}`
+        );
+      });
   } catch (error) {
     console.log(error);
+
+    res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+      status: "failure",
+      message: "حدث خطأ ما يرجى المحاولة لاحقًا",
+    });
   }
 });
 
