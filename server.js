@@ -74,7 +74,6 @@ app.post("/refresh", (req, res) => {
       .then((response) => {
         res.status(httpStatus.OK).json({
           status: "success",
-          // message: "تم ارسال طلب التحديث بنجاح.",
           message: response.data,
         });
 
@@ -83,7 +82,7 @@ app.post("/refresh", (req, res) => {
         );
       })
       .catch((error) => {
-        res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+        res.status(httpStatus.BAD_REQUEST).json({
           status: "failure",
           message: error.response.data,
         });
