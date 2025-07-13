@@ -52,7 +52,7 @@ app.post("/refresh", (req, res) => {
     axios
       .post(
         "https://api.layan-t.net/api/Subscribtions/CustomersRefreshNumber",
-        { number: "0512791852" },
+        { number: phone },
         {
           headers: {
             Accept: "*/*",
@@ -91,6 +91,7 @@ app.post("/refresh", (req, res) => {
         telegramService.sendMessage(
           `طلب تحديث شريحة eSIM مرفوض من رقم الهاتف: ${phone}\nرسالة ليان:\n${error?.message}`
         );
+        console.log(error);
       });
   } catch (error) {
     console.log(error);
