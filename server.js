@@ -85,11 +85,11 @@ app.post("/refresh", (req, res) => {
       .catch((error) => {
         res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
           status: "failure",
-          message: "حدث خطأ ما يرجى المحاولة لاحقًا",
+          message: error.response.data,
         });
 
         telegramService.sendMessage(
-          `طلب تحديث شريحة eSIM مرفوض من رقم الهاتف: ${phone}\nرسالة ليان:\n${error.data}`
+          `طلب تحديث شريحة eSIM مرفوض من رقم الهاتف: ${phone}\nرسالة ليان:\n${error.response.data}`
         );
       });
   } catch (error) {
